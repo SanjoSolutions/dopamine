@@ -20,6 +20,7 @@ r"""The entry point for running a Dopamine agent.
 from absl import app
 from absl import flags
 from absl import logging
+from dopamine.discrete_domains.run_experiment import Runner, create_agent
 
 from dopamine.discrete_domains import run_experiment
 import tensorflow as tf
@@ -55,7 +56,12 @@ def main(unused_argv):
   gin_files = FLAGS.gin_files
   gin_bindings = FLAGS.gin_bindings
   run_experiment.load_gin_configs(gin_files, gin_bindings)
-  runner = run_experiment.create_runner(base_dir)
+
+  def create_agent2(sess, environment, summary_writer=None):
+    return create_agent(sess, environment, summary_writer=summary_writer, debug_mode=True)
+
+  runner = Runner(base_dir, create_agent2)
+  # runner = run_experiment.create_runner(base_dir)
   runner.run_experiment()
 
 
