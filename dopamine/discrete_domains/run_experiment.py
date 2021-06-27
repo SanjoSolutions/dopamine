@@ -31,10 +31,6 @@ from dopamine.discrete_domains import atari_lib
 from dopamine.discrete_domains import checkpointer
 from dopamine.discrete_domains import iteration_statistics
 from dopamine.discrete_domains import logger
-from dopamine.jax.agents.dqn import dqn_agent as jax_dqn_agent
-from dopamine.jax.agents.implicit_quantile import implicit_quantile_agent as jax_implicit_quantile_agent
-from dopamine.jax.agents.quantile import quantile_agent as jax_quantile_agent
-from dopamine.jax.agents.rainbow import rainbow_agent as jax_rainbow_agent
 
 import numpy as np
 import tensorflow as tf
@@ -90,21 +86,6 @@ def create_agent(sess, environment, agent_name=None, summary_writer=None,
   elif agent_name == 'implicit_quantile':
     return implicit_quantile_agent.ImplicitQuantileAgent(
         sess, num_actions=environment.action_space.n,
-        summary_writer=summary_writer)
-  elif agent_name == 'jax_dqn':
-    return jax_dqn_agent.JaxDQNAgent(num_actions=environment.action_space.n,
-                                     summary_writer=summary_writer)
-  elif agent_name == 'jax_quantile':
-    return jax_quantile_agent.JaxQuantileAgent(
-        num_actions=environment.action_space.n,
-        summary_writer=summary_writer)
-  elif agent_name == 'jax_rainbow':
-    return jax_rainbow_agent.JaxRainbowAgent(
-        num_actions=environment.action_space.n,
-        summary_writer=summary_writer)
-  elif agent_name == 'jax_implicit_quantile':
-    return jax_implicit_quantile_agent.JaxImplicitQuantileAgent(
-        num_actions=environment.action_space.n,
         summary_writer=summary_writer)
   else:
     raise ValueError('Unknown agent: {}'.format(agent_name))
@@ -297,11 +278,8 @@ class Runner(object):
       reward: float, the last reward from the environment.
       terminal: bool, whether the last state-action led to a terminal state.
     """
-    if isinstance(self._agent, jax_dqn_agent.JaxDQNAgent):
-      self._agent.end_episode(reward, terminal)
-    else:
-      # TODO(joshgreaves): Add terminal signal to TF dopamine agents
-      self._agent.end_episode(reward)
+    # TODO(joshgreaves): Add terminal signal to TF dopamine agents
+    self._agent.end_episode(reward)
 
   def _run_one_episode(self):
     """Executes a full trajectory of the agent interacting with the environment.
